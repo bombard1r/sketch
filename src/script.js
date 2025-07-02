@@ -8,6 +8,56 @@ import fragmentShader from './shaders/fragment.glsl'
 // GUI
 const gui = new dat.GUI()
 
+// Paper Textures
+const texScale = 0.2
+const textureLoader = new THREE.TextureLoader()
+const paperColor = textureLoader.load('/textures/paper/Paper001_1K-JPG_Color.jpg')
+paperColor.colorSpace = THREE.SRGBColorSpace
+paperColor.repeat.set(texScale,texScale)
+paperColor.wrapS = THREE.RepeatWrapping
+paperColor.wrapT = THREE.RepeatWrapping
+
+// const paperDisplacement = textureLoader.load('/textures/paper/Paper001_1K-JPG_Displacement.jpg')
+// paperDisplacement.repeat.set(texScale,texScale)
+// paperDisplacement.wrapS = THREE.RepeatWrapping
+// paperDisplacement.wrapT = THREE.RepeatWrapping
+
+const paperNormal = textureLoader.load('/textures/paper/Paper001_1K-JPG_NormalGL.jpg')
+paperNormal.repeat.set(texScale,texScale)
+paperNormal.wrapS = THREE.RepeatWrapping
+paperNormal.wrapT = THREE.RepeatWrapping
+
+const paperRoughness = textureLoader.load('/textures/paper/Paper001_1K-JPG_Roughness.jpg')
+paperRoughness.repeat.set(texScale,texScale)
+paperRoughness.wrapS = THREE.RepeatWrapping
+paperRoughness.wrapT = THREE.RepeatWrapping
+
+
+// Leather Textures
+const coverColor = textureLoader.load('/textures/leather/Leather030_1K-JPG_Color.jpg')
+coverColor.colorSpace = THREE.SRGBColorSpace
+coverColor.repeat.set(0.05, 0.7)
+coverColor.wrapS = THREE.RepeatWrapping
+coverColor.wrapT = THREE.RepeatWrapping
+
+const coverDisplacement = textureLoader.load('/textures/leather/Leather030_1K-JPG_Displacement.jpg')
+coverDisplacement.repeat.set(0.05,0.7)
+coverDisplacement.wrapS = THREE.RepeatWrapping
+coverDisplacement.wrapT = THREE.RepeatWrapping
+const coverNormal = textureLoader.load('/textures/leather/Leather030_1K-JPG_NormalGL.jpg')
+coverNormal.repeat.set(0.05,0.7)
+coverNormal.wrapS = THREE.RepeatWrapping
+coverNormal.wrapT = THREE.RepeatWrapping
+const coverRoughness = textureLoader.load('/textures/leather/Leather030_1K-JPG_Roughness.jpg')
+coverRoughness.repeat.set(0.05,0.7)
+coverRoughness.wrapS = THREE.RepeatWrapping
+coverRoughness.wrapT = THREE.RepeatWrapping
+
+// Cover Textures
+const cover1Color = coverColor.clone()
+cover1Color.repeat.set(1,1)
+
+
 // Scene
 const scene = new THREE.Scene()
 
@@ -34,9 +84,15 @@ const baseGeo = new THREE.PlaneGeometry(
   base.height,
   64,64
 )
-const baseMaterial = new THREE.MeshBasicMaterial({
-  color: 0xcccccc,
+const baseMaterial = new THREE.MeshStandardMaterial({
+  // color: 0xcccccc,
   side: THREE.DoubleSide,
+  map: coverColor,
+  displacementMap: coverDisplacement,
+  displacementScale: - 0.1,
+  displacementBias: 0,
+  normalMap: coverNormal,
+  roughnessMap: coverRoughness,
 })
 const basePlane = new THREE.Mesh(baseGeo, baseMaterial)
 scene.add(basePlane)
@@ -48,16 +104,37 @@ const coverGeo = new THREE.PlaneGeometry(
   base.height,
   64,64
 )
-// const sheetGeo = new THREE.PlaneGeometry(
-//   sheet.width,
-//   base.height,
-//   64,64
-// )
-const sheetMaterial = new THREE.MeshBasicMaterial({
-  color: 0xff0000,
+const sheetGeo = new THREE.PlaneGeometry(
+  sheet.width,
+  base.height - thick.cover * 5,
+  64,64
+)
+
+const sheetMaterial = new THREE.MeshStandardMaterial({
+  // color: 0xff0000,
   side: THREE.DoubleSide,
+  map: paperColor,
+  // displacementMap: paperDisplacement,
+  // displacementScale: 0.3,
+  // displacementBias: - 0.15,
+  normalMap: paperNormal,
+  roughnessMap: paperRoughness,
 })
 
+const coverMaterial = new THREE.MeshStandardMaterial({
+  // color: 0xcccccc,
+  side: THREE.DoubleSide,
+  map: cover1Color,
+  // displacementMap: coverDisplacement,
+  // displacementScale: 0.1,
+  // displacementBias: 0.05,
+  normalMap: coverNormal,
+  roughnessMap: coverRoughness,
+})
+
+// Light
+const ambientLight = new THREE.AmbientLight(0xffffff, 2.0) 
+scene.add(ambientLight)
 
 
 // Camera
@@ -120,9 +197,9 @@ function pageRot(number, part)
   const curve = Math.abs(1 / (2 * numberS))
   const curve1 = 1 / curve
   const offset = ( - curve1 + Math.sqrt( curve1 * curve1 + 4 * curve1 )) / ( 2 * curve1 ) + addOffset
-  let angle = Math.PI * ((curve / (part + offset * sign)) - offset * sign)  // ERROR !!!
+  let angle = Math.PI * ((curve / (part + offset * sign)) - offset * sign)  
   // angle = Math.PI * (sheet.count - number) / sheet.count
-  console.log(angle)
+  // console.log(angle)
 
   const pageVec = new THREE.Vector3((sheet.width / 2) * Math.cos(angle), 0.0, (sheet.width / 2) * Math.sin(angle))
   const pageCoord = new THREE.Vector3().addVectors(edgeWorld, pageVec)
@@ -133,13 +210,18 @@ function pageRot(number, part)
 // Sheets
 for (let i = 1; i <= sheet.count; i ++)
 {
-  const sheeet = new THREE.Mesh(coverGeo, sheetMaterial)
-  sheet.array.push(sheeet)
-  if (i)
+  let sheeet
+  if (i == sheet.count / 2 || i == (sheet.count / 2) + 1)
   {
-    scene.add(sheeet)
-    pageRot(i,0.4)
+    sheeet = new THREE.Mesh(coverGeo, coverMaterial)
+  } else
+  {
+    sheeet = new THREE.Mesh(sheetGeo, sheetMaterial)
   }
+  // const sheeet = new THREE.Mesh(coverGeo, sheetMaterial)
+  sheet.array.push(sheeet)
+  scene.add(sheeet)
+  pageRot(i,0.4)
 }
 
 
