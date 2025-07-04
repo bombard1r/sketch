@@ -9,7 +9,7 @@ import fragmentShader from './shaders/fragment.glsl'
 const gui = new dat.GUI()
 
 // Paper Textures
-const texScale = 0.2
+const texScale = 1.3
 const textureLoader = new THREE.TextureLoader()
 const paperColor = textureLoader.load('/textures/paper/Paper001_1K-JPG_Color.jpg')
 paperColor.colorSpace = THREE.SRGBColorSpace
@@ -56,6 +56,11 @@ coverRoughness.wrapT = THREE.RepeatWrapping
 // Cover Textures
 const cover1Color = coverColor.clone()
 cover1Color.repeat.set(1,1)
+const cover1Normal = coverNormal.clone()
+cover1Normal.repeat.set(1,1)
+const cover1Roughness = coverRoughness.clone()
+cover1Roughness.repeat.set(1,1)
+
 
 
 // Scene
@@ -127,13 +132,17 @@ const coverMaterial = new THREE.MeshStandardMaterial({
   // displacementMap: coverDisplacement,
   // displacementScale: 0.1,
   // displacementBias: 0.05,
-  normalMap: coverNormal,
-  roughnessMap: coverRoughness,
+  normalMap: cover1Normal,
+  roughnessMap: cover1Roughness,
 })
 
 // Light
-const ambientLight = new THREE.AmbientLight(0xffffff, 2.0) 
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8) 
 scene.add(ambientLight)
+
+const pointLight = new THREE.PointLight(0xff9000, 1500)
+pointLight.position.set(0,-10,40)
+scene.add(pointLight)
 
 
 // Camera
