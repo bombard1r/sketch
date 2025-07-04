@@ -78,6 +78,7 @@ const base =
   {
     width: thick.paper * sheet.count + thick.cover * 2,
     height: sheet.height + thick.cover * 2,
+    angle: 0.0
   }
 const baseGeo = new THREE.PlaneGeometry( 
   base.width, 
@@ -88,9 +89,9 @@ const baseMaterial = new THREE.MeshStandardMaterial({
   // color: 0xcccccc,
   side: THREE.DoubleSide,
   map: coverColor,
-  displacementMap: coverDisplacement,
-  displacementScale: - 0.1,
-  displacementBias: 0,
+  // displacementMap: coverDisplacement,
+  // displacementScale: - 0.1,
+  // displacementBias: 0,
   normalMap: coverNormal,
   roughnessMap: coverRoughness,
 })
@@ -177,27 +178,57 @@ window.addEventListener('resize', () =>
 
 function pageRot(number, part)
 {
-  let addOffset
+  let xoffset
+  let yoffset
   let sign
   let numberS
+  let minAngle
+  let maxAngle
+  const baseAngle = 1.0 - (part/10) + 0.5
+
   if (number > 5)
   {
     numberS = 11 - number
-    addOffset = 1.0
     sign = - 1.0
   } else 
   {
     numberS = number
-    addOffset = 0.0
+    xoffset = - 11.1 + numberS
+    yoffset = 1.1
     sign = 1.0
   }
-  const edge = new THREE.Vector3( sign * (base.width / 2) * (numberS / (sheet.count / 2)) , 0, 0 )  // Get a point anchor for the page on the static base
+
+  if ( baseAngle <= 1.0 )
+  {
+    maxAngle = baseAngle - 0.1
+    minAngle = 0.0
+  } else 
+  {
+    maxAngle = 0.9
+    minAngle = baseAngle - 1.0
+  }
+  
+  console.log(maxAngle, minAngle)
+  const edge = new THREE.Vector3( sign * (base.width / 2) * ((6 - numberS) / (sheet.count / 2)) , 0, 0 )  // Get a point anchor for the page on the static base
   const edgeWorld = edge.clone().applyMatrix4(basePlane.matrixWorld)  // Same anchor point but in space
 
-  const curve = Math.abs(1 / (2 * numberS))
-  const curve1 = 1 / curve
-  const offset = ( - curve1 + Math.sqrt( curve1 * curve1 + 4 * curve1 )) / ( 2 * curve1 ) + addOffset
-  let angle = Math.PI * ((curve / (part + offset * sign)) - offset * sign)  
+  const curve = 1.4
+  let angle = Math.sqrt( - part * curve + (number) * curve)
+  if (!angle)
+  {
+    angle = minAngle
+  } else if (angle > maxAngle)
+  {
+    angle = maxAngle
+  } else if (angle < minAngle) 
+  {
+    angle = minAngle
+  } else 
+  {
+    angle = angle
+  }
+  angle = angle * Math.PI + number / 85
+  // console.log(number, angle)
   // angle = Math.PI * (sheet.count - number) / sheet.count
   // console.log(angle)
 
@@ -211,7 +242,7 @@ function pageRot(number, part)
 for (let i = 1; i <= sheet.count; i ++)
 {
   let sheeet
-  if (i == sheet.count / 2 || i == (sheet.count / 2) + 1)
+  if (i == sheet.count || i == 1)
   {
     sheeet = new THREE.Mesh(coverGeo, coverMaterial)
   } else
@@ -221,7 +252,7 @@ for (let i = 1; i <= sheet.count; i ++)
   // const sheeet = new THREE.Mesh(coverGeo, sheetMaterial)
   sheet.array.push(sheeet)
   scene.add(sheeet)
-  pageRot(i,0.4)
+  pageRot(i,0)
 }
 
 
@@ -229,13 +260,12 @@ for (let i = 1; i <= sheet.count; i ++)
 window.addEventListener('pointermove', (event) =>
   {
     const part = event.clientX / sizes.width
-    const flipValue = 1.0 - part
-    // planeMaterial.uniforms.uAngle.value = flipValue
-    basePlane.rotation.y = - Math.PI * ( flipValue - 0.5 )
+    base.angle =  (part - 0.5) 
+    basePlane.rotation.y = base.angle * Math.PI
 
     for (let i = 1; i <= sheet.count; i ++)
     {
-      pageRot(i, part)
+      pageRot(i, part * 10)
     }
   })
 
