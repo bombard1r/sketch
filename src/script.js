@@ -102,6 +102,7 @@ const baseMaterial = new THREE.MeshStandardMaterial({
 })
 const basePlane = new THREE.Mesh(baseGeo, baseMaterial)
 scene.add(basePlane)
+basePlane.position.set(0,0,0)
 
 
 // Covers
@@ -153,7 +154,7 @@ const sizes =
     pixelRatio: Math.min(window.devicePixelRatio, 2)
   }
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-camera.position.set(0,0,30)
+camera.position.set(0,0,20)
 scene.add(camera)
 
 // Render
@@ -186,7 +187,7 @@ window.addEventListener('resize', () =>
 function pageRot(number, part)
 {
   let coverOffset = 0
-  let coverAnchor = 0
+  let coverAnchor = 0.15
   let sheetWidth = sheet.width / 2
   let sign
   let numberS
@@ -261,23 +262,75 @@ for (let i = 1; i <= sheet.count; i ++)
   {
     sheeet = new THREE.Mesh(sheetGeo, sheetMaterial)
   }
-  // const sheeet = new THREE.Mesh(coverGeo, sheetMaterial)
+
   sheet.array.push(sheeet)
   scene.add(sheeet)
-  pageRot(i,0)
+  pageRot(i,5)
 }
 
 
 // Pointer
 window.addEventListener('pointermove', (event) =>
   {
-    const part = event.clientX / sizes.width
+    // const part = event.clientX / sizes.width
     base.angle =  (part - 0.5) 
     basePlane.rotation.y = base.angle * Math.PI
+    //
+    // for (let i = 1; i <= sheet.count; i ++)
+    // {
+    //   pageRot(i, part * 10)
+    // }
+  })
 
-    for (let i = 1; i <= sheet.count; i ++)
+let activeNum = 5
+let desNum = 5
+let speedNum = 0
+window.addEventListener('keypress', (event) =>
+  {
+    if (event.key >= 0 && event.key <=9)
     {
-      pageRot(i, part * 10)
+      const newNum = event.key
+      desNum = newNum
+
+      speedNum = 2 * (desNum - activeNum) / 100
+    }
+  })
+
+
+window.addEventListener('keypress', (event) =>
+  {
+    if (event.code === 'KeyP')
+    {
+      let loaded = 0
+      const paperImage = paperColor.image 
+      const pictureImage = new Image()
+      pictureImage.crossOrigin = 'anonymous'
+      pictureImage.src = '/wings.jpg'
+
+      function checkLoaded() 
+      {
+        loaded ++
+        if (loaded === 1)
+        {
+          const canvas = document.createElement('canvas')
+          canvas.width = sheet.width * 100
+          canvas.height = sheet.height * 100
+
+          const context = canvas.getContext('2d')
+          context.drawImage(paperImage, 0, 0, canvas.width, canvas.height)
+          context.globalAlpha = 0.9
+          context.globalCompositeOperation = 'multiply'
+          context.drawImage(pictureImage, 100, 100, canvas.width / 20, canvas.height / 20)
+          
+          const blendedTexture = new THREE.CanvasTexture(canvas)
+          blendedTexture.needsUpdate = true
+
+          sheet.array[1].material.map = blendedTexture
+        }
+      }
+
+      paperImage.onload = checkLoaded
+      pictureImage.onload = checkLoaded
     }
   })
 
@@ -293,6 +346,20 @@ const tick = () =>
  
   // Update Controls 
   controls.update()
+
+  if (speedNum !== 0)
+  {
+    activeNum += speedNum
+    speedNum = 2 * (desNum - activeNum) / 50
+
+    base.angle =  (activeNum / 10 - 0.5) 
+    basePlane.rotation.y = base.angle * Math.PI
+
+    for (let i = 1; i <= sheet.count; i ++)
+    {
+      pageRot(i, activeNum)
+    }
+  }
 
   // Render
   renderer.render(scene, camera)
