@@ -1,3 +1,4 @@
+import { scene, sizes, camera, renderer, addLights, canvas } from './scene.js'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
@@ -63,8 +64,6 @@ cover1Roughness.repeat.set(1,1)
 
 
 
-// Scene
-const scene = new THREE.Scene()
 
 // Plane
 const sheet = {
@@ -137,33 +136,8 @@ const coverMaterial = new THREE.MeshStandardMaterial({
   roughnessMap: cover1Roughness,
 })
 
-// Light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.8) 
-scene.add(ambientLight)
 
-const pointLight = new THREE.PointLight(0xff9000, 1500)
-pointLight.position.set(0,-10,40)
-scene.add(pointLight)
-
-
-// Camera
-const sizes = 
-  {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    pixelRatio: Math.min(window.devicePixelRatio, 2)
-  }
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-camera.position.set(0,0,20)
-scene.add(camera)
-
-// Render
-const canvas = document.querySelector('canvas.webgl')
-
-const renderer = new THREE.WebGLRenderer({ canvas: canvas })
-renderer.setSize(sizes.width, sizes.height)
-
-renderer.render(scene, camera)
+addLights()
 
 // Resize
 window.addEventListener('resize', () =>
@@ -269,18 +243,18 @@ for (let i = 1; i <= sheet.count; i ++)
 }
 
 
-// Pointer
-window.addEventListener('pointermove', (event) =>
-  {
-    // const part = event.clientX / sizes.width
-    base.angle =  (part - 0.5) 
-    basePlane.rotation.y = base.angle * Math.PI
-    //
-    // for (let i = 1; i <= sheet.count; i ++)
-    // {
-    //   pageRot(i, part * 10)
-    // }
-  })
+// // Pointer
+// window.addEventListener('pointermove', (event) =>
+//   {
+//     // const part = event.clientX / sizes.width
+//     base.angle =  (part - 0.5) 
+//     basePlane.rotation.y = base.angle * Math.PI
+//     //
+//     // for (let i = 1; i <= sheet.count; i ++)
+//     // {
+//     //   pageRot(i, part * 10)
+//     // }
+//   })
 
 let activeNum = 5
 let desNum = 5
