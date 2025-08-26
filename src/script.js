@@ -1,4 +1,10 @@
-import { scene, sizes, camera, renderer, addLights, canvas } from './scene.js'
+import { scene, sizes, camera, renderer, addLights, canvas, resizeHandler } from './scene.js'
+import { 
+    paperColor, paperDisplacement, paperNormal, paperRoughness, 
+    coverColor, coverDisplacement, coverNormal, coverRoughness, 
+    cover1Color, cover1Normal, cover1Roughness 
+} from './textures.js'
+import { basePlane, sheet, thick, base } from './base.js'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
@@ -6,102 +12,9 @@ import vertexShader from './shaders/vertex.glsl'
 import fragmentShader from './shaders/fragment.glsl'
 
 
+
 // GUI
 const gui = new dat.GUI()
-
-// Paper Textures
-const texScale = 1.3
-const textureLoader = new THREE.TextureLoader()
-const paperColor = textureLoader.load('/textures/paper/Paper001_1K-JPG_Color.jpg')
-paperColor.colorSpace = THREE.SRGBColorSpace
-paperColor.repeat.set(texScale,texScale)
-paperColor.wrapS = THREE.RepeatWrapping
-paperColor.wrapT = THREE.RepeatWrapping
-
-// const paperDisplacement = textureLoader.load('/textures/paper/Paper001_1K-JPG_Displacement.jpg')
-// paperDisplacement.repeat.set(texScale,texScale)
-// paperDisplacement.wrapS = THREE.RepeatWrapping
-// paperDisplacement.wrapT = THREE.RepeatWrapping
-
-const paperNormal = textureLoader.load('/textures/paper/Paper001_1K-JPG_NormalGL.jpg')
-paperNormal.repeat.set(texScale,texScale)
-paperNormal.wrapS = THREE.RepeatWrapping
-paperNormal.wrapT = THREE.RepeatWrapping
-
-const paperRoughness = textureLoader.load('/textures/paper/Paper001_1K-JPG_Roughness.jpg')
-paperRoughness.repeat.set(texScale,texScale)
-paperRoughness.wrapS = THREE.RepeatWrapping
-paperRoughness.wrapT = THREE.RepeatWrapping
-
-
-// Leather Textures
-const coverColor = textureLoader.load('/textures/leather/Leather030_1K-JPG_Color.jpg')
-coverColor.colorSpace = THREE.SRGBColorSpace
-coverColor.repeat.set(0.05, 0.7)
-coverColor.wrapS = THREE.RepeatWrapping
-coverColor.wrapT = THREE.RepeatWrapping
-
-const coverDisplacement = textureLoader.load('/textures/leather/Leather030_1K-JPG_Displacement.jpg')
-coverDisplacement.repeat.set(0.05,0.7)
-coverDisplacement.wrapS = THREE.RepeatWrapping
-coverDisplacement.wrapT = THREE.RepeatWrapping
-const coverNormal = textureLoader.load('/textures/leather/Leather030_1K-JPG_NormalGL.jpg')
-coverNormal.repeat.set(0.05,0.7)
-coverNormal.wrapS = THREE.RepeatWrapping
-coverNormal.wrapT = THREE.RepeatWrapping
-const coverRoughness = textureLoader.load('/textures/leather/Leather030_1K-JPG_Roughness.jpg')
-coverRoughness.repeat.set(0.05,0.7)
-coverRoughness.wrapS = THREE.RepeatWrapping
-coverRoughness.wrapT = THREE.RepeatWrapping
-
-// Cover Textures
-const cover1Color = coverColor.clone()
-cover1Color.repeat.set(1,1)
-const cover1Normal = coverNormal.clone()
-cover1Normal.repeat.set(1,1)
-const cover1Roughness = coverRoughness.clone()
-cover1Roughness.repeat.set(1,1)
-
-
-
-
-// Plane
-const sheet = {
-  width: 15,
-  height:21,
-  array: [],
-  count: 10,
-}
-const thick = {
-  paper: 0.02,
-  cover: 0.3,
-}
-
-// Base
-const base = 
-  {
-    width: thick.paper * sheet.count + thick.cover * 3,
-    height: sheet.height + thick.cover * 2,
-    angle: 0.0
-  }
-const baseGeo = new THREE.BoxGeometry( 
-  base.width, 
-  base.height,
-  thick.cover
-)
-const baseMaterial = new THREE.MeshStandardMaterial({
-  // color: 0xcccccc,
-  side: THREE.DoubleSide,
-  map: coverColor,
-  // displacementMap: coverDisplacement,
-  // displacementScale: - 0.1,
-  // displacementBias: 0,
-  normalMap: coverNormal,
-  roughnessMap: coverRoughness,
-})
-const basePlane = new THREE.Mesh(baseGeo, baseMaterial)
-scene.add(basePlane)
-basePlane.position.set(0,0,0)
 
 
 // Covers
@@ -138,23 +51,7 @@ const coverMaterial = new THREE.MeshStandardMaterial({
 
 
 addLights()
-
-// Resize
-window.addEventListener('resize', () =>
-  {
-    // Update sizes
-    sizes.width  = window.innerWidth
-    sizes.height = window.innerHeight
-    sizes.pixelRatio = Math.min(window.devicePixelRatio, 2)
-
-    // Update Camera 
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(sizes.pixelRatio)
-  })
+resizeHandler()
 
 
 

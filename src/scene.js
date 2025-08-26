@@ -33,4 +33,24 @@ function addLights() {
     scene.add(pointLight)
 }
 
-export { scene, sizes, camera, renderer, addLights, canvas };
+
+// Resize
+function resizeHandler() {
+    window.addEventListener('resize', () =>
+        {
+            // Update sizes
+            sizes.width  = window.innerWidth
+            sizes.height = window.innerHeight
+            sizes.pixelRatio = Math.min(window.devicePixelRatio, 2)
+
+            // Update Camera 
+            camera.aspect = sizes.width / sizes.height
+            camera.updateProjectionMatrix()
+
+            // Update renderer
+            renderer.setSize(sizes.width, sizes.height)
+            renderer.setPixelRatio(sizes.pixelRatio)
+        })
+}
+
+export { scene, sizes, camera, renderer, addLights, canvas, resizeHandler };
