@@ -1,10 +1,6 @@
 import * as THREE from 'three'
 import { scene } from './scene.js'
-import { 
-    coverColor, coverDisplacement, coverNormal, coverRoughness,
-    cover1Color, cover1Normal, cover1Roughness,
-    paperColor, paperDisplacement, paperNormal, paperRoughness
-} from './textures.js'
+import { textures } from './textures.js'
 
 
 // Plane
@@ -34,12 +30,12 @@ const baseGeo = new THREE.BoxGeometry(
 const baseMaterial = new THREE.MeshStandardMaterial({
   // color: 0xcccccc,
   side: THREE.DoubleSide,
-  map: coverColor,
+  // map: textures.coverColor,
   // displacementMap: coverDisplacement,
   // displacementScale: - 0.1,
   // displacementBias: 0,
-  normalMap: coverNormal,
-  roughnessMap: coverRoughness,
+  // normalMap: textures.coverNormal,
+  // roughnessMap: textures.coverRoughness,
 })
 const basePlane = new THREE.Mesh(baseGeo, baseMaterial)
 scene.add(basePlane)
@@ -54,12 +50,12 @@ const coverGeo = new THREE.BoxGeometry(
 )
 const coverMaterial = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
-  map: cover1Color,
+  // map: textures.cover1Color,
   // displacementMap: coverDisplacement,
   // displacementScale: 0.1,
   // displacementBias: 0.05,
-  normalMap: cover1Normal,
-  roughnessMap: cover1Roughness,
+  // normalMap: textures.cover1Normal,
+  // roughnessMap: textures.cover1Roughness,
 })
 
 
@@ -72,19 +68,34 @@ const sheetGeo = new THREE.PlaneGeometry(
 
 const sheetMaterial = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
-  map: paperColor,
+  // map: textures.paperColor,
   // displacementMap: paperDisplacement,
   // displacementScale: 0.3,
   // displacementBias: - 0.15,
-  normalMap: paperNormal,
-  roughnessMap: paperRoughness,
+  // normalMap: textures.paperNormal,
+  // roughnessMap: textures.paperRoughness,
 })
 
+
+function setTextures(){
+    baseMaterial.map = textures.coverColor
+    baseMaterial.normalMap = textures.coverNormal
+    baseMaterial.roughnessMap = textures.coverRoughness
+
+    coverMaterial.map = textures.cover1Color
+    coverMaterial.normalMap = textures.cover1Normal
+    coverMaterial.roughnessMap = textures.cover1Roughness
+
+    sheetMaterial.map = textures.paperColor
+    sheetMaterial.normalMap = textures.paperNormal
+    sheetMaterial.roughnessMap = textures.paperRoughness
+}
 
 
 export { 
     sheet, thick, 
     basePlane,  base,
     coverGeo, coverMaterial,
-    sheetGeo, sheetMaterial
+    sheetGeo, sheetMaterial,
+    setTextures
 }

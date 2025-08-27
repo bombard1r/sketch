@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { sheet } from './base.js'
-import { paperColor } from './textures.js'
+import { textures } from './textures.js'
 
 
 // Print image on key 'P'
@@ -11,7 +11,7 @@ export function  printImage()
             if (event.code === 'KeyP')
             {
                 let loaded = 0
-                const paperImage = paperColor.image 
+                const paperImage = textures.paperColor.image 
                 const pictureImage = new Image()
                 pictureImage.crossOrigin = 'anonymous'
                 pictureImage.src = '/wings.jpg'
