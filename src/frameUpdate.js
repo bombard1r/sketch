@@ -24,8 +24,8 @@ export function flipPage()
 }
 
 // Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+// const controls = new OrbitControls(camera, canvas)
+// controls.enableDamping = true
 
 const clock = new THREE.Clock()
 
@@ -34,7 +34,7 @@ export function tick()
     const elapsedTime = clock.getElapsedTime()
 
     // Update Controls 
-    controls.update()
+    // controls.update()
 
     if (speedNum !== 0)
     {
