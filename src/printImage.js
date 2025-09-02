@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import { sheet } from './base.js'
 import { textures } from './textures.js'
+import { materials } from './base.js'
 
 let isDrawing = false // Flag to track if the image is being drawn
-let scale = 1.0 // Scale factor for zooming
+let scale = 0.5 // Scale factor for zooming
 let isMoving = false // Flag to track if the image is being moved
-let position = { x: 10, y: 10 } // Position of the image
+let position = { x: 100, y: 100 } // Position of the image
 
 // Print image on key 'P'
 export function  printImage() 
@@ -22,14 +23,19 @@ export function  printImage()
     canvas.width = sheet.width * 100
     canvas.height = sheet.height * 100
     const context = canvas.getContext('2d')
+    console.log('Canvas size:', canvas.width, canvas.height)
 
 
     function drawImage()
     {
+        // Reset context state
+        context.globalAlpha = 1.0;
+        context.globalCompositeOperation = 'source-over';
         // Clear canvas
         context.clearRect(0, 0, canvas.width, canvas.height)
 
         // Draw paper texture first
+        console.log(canvas.width, canvas.height)
         context.drawImage(paperImage, 0, 0, canvas.width, canvas.height)
         context.globalAlpha = 0.9
         context.globalCompositeOperation = 'multiply'
@@ -42,7 +48,8 @@ export function  printImage()
         blendedTexture.needsUpdate = true
 
         // Apply the blended texture to the paper material
-        sheet.array[1].material.map = blendedTexture
+        materials.sheets[1].uniforms.frontTexture.value = blendedTexture
+        materials.sheets[1].needsUpdate = true
     }
 
 

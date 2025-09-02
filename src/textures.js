@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { startScene } from './startScene.js'
+import { sheet } from './base.js'
 
 
 
@@ -24,7 +25,7 @@ function checkLoad() {
 const texRep = 1.3
 function loadTextures() {
     console.log('Start loading textures')
-    textures.paperColor = textureLoader.load('/textures/paper/Paper001_1K-JPG_Color.jpg', checkLoad())
+    textures.paperColor = textureLoader.load('/textures/paper/Paper001_1K-JPG_Color.jpg', checkLoad)
     textures.paperColor.colorSpace = THREE.SRGBColorSpace
     texScale(textures.paperColor, texRep, texRep)
     textures.paperDisplacement = textureLoader.load('/textures/paper/Paper001_1K-JPG_Displacement.jpg', checkLoad)

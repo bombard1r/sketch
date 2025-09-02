@@ -8,6 +8,9 @@ import { scene, camera, renderer, canvas } from './scene.js'
 let activeNum = 5
 let desNum = 5
 let speedNum = 0
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
 export function flipPage() 
 {
     window.addEventListener('keypress', (event) =>
@@ -17,7 +20,7 @@ export function flipPage()
                 const newNum = event.key
                 desNum = newNum
 
-                speedNum = 2 * (desNum - activeNum) / 100
+                speedNum = (desNum - activeNum) * easeOutCubic(0.016)
             }
         }
     )
@@ -39,7 +42,7 @@ export function tick()
     if (speedNum !== 0)
     {
         activeNum += speedNum
-        speedNum = 2 * (desNum - activeNum) / 50
+        speedNum = (desNum - activeNum) * easeOutCubic(0.016)
 
         base.angle =  (activeNum / 10 - 0.5) 
         basePlane.rotation.y = base.angle * Math.PI

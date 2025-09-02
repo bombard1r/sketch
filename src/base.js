@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { scene } from './scene.js'
 import { textures } from './textures.js'
-
+import vertexShader from './shaders/vertex.glsl'
+import fragmentShader from './shaders/fragment.glsl'
 
 // Plane
 const sheet = {
@@ -14,8 +15,11 @@ const thick = {
   paper: 0.02,
   cover: 0.3,
 }
+const materials = {}
 
-// Base
+//
+    //Base
+//
 const base = 
   {
     width: thick.paper * sheet.count + thick.cover * 3,
@@ -27,75 +31,69 @@ const baseGeo = new THREE.BoxGeometry(
   base.height,
   thick.cover
 )
-const baseMaterial = new THREE.MeshStandardMaterial({
-  // color: 0xcccccc,
+materials.base = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
-  // map: textures.coverColor,
-  // displacementMap: coverDisplacement,
-  // displacementScale: - 0.1,
-  // displacementBias: 0,
-  // normalMap: textures.coverNormal,
-  // roughnessMap: textures.coverRoughness,
 })
-const basePlane = new THREE.Mesh(baseGeo, baseMaterial)
+const basePlane = new THREE.Mesh(baseGeo, materials.base)
 scene.add(basePlane)
 basePlane.position.set(0,0,0)
 
 
-// Covers
+//
+    //Covers
+//
 const coverGeo = new THREE.BoxGeometry(
   sheet.width + thick.cover * 2,
   base.height,
   thick.cover - 0.15
 )
-const coverMaterial = new THREE.MeshStandardMaterial({
+materials.cover = new THREE.MeshStandardMaterial({
   side: THREE.DoubleSide,
-  // map: textures.cover1Color,
-  // displacementMap: coverDisplacement,
-  // displacementScale: 0.1,
-  // displacementBias: 0.05,
-  // normalMap: textures.cover1Normal,
-  // roughnessMap: textures.cover1Roughness,
 })
 
 
-// Sheets
+//
+    //Sheets
+//
 const sheetGeo = new THREE.PlaneGeometry(
   sheet.width,
   base.height - thick.cover * 5,
   64,64
 )
-
-const sheetMaterial = new THREE.MeshStandardMaterial({
-  side: THREE.DoubleSide,
-  // map: textures.paperColor,
-  // displacementMap: paperDisplacement,
-  // displacementScale: 0.3,
-  // displacementBias: - 0.15,
-  // normalMap: textures.paperNormal,
-  // roughnessMap: textures.paperRoughness,
-})
-
+materials.sheets = []
 
 function setTextures(){
-    baseMaterial.map = textures.coverColor
-    baseMaterial.normalMap = textures.coverNormal
-    baseMaterial.roughnessMap = textures.coverRoughness
+    materials.base.map = textures.coverColor
+    materials.base.normalMap = textures.coverNormal
+    materials.base.roughnessMap = textures.coverRoughness
 
-    coverMaterial.map = textures.cover1Color
-    coverMaterial.normalMap = textures.cover1Normal
-    coverMaterial.roughnessMap = textures.cover1Roughness
+    materials.cover.map = textures.cover1Color
+    materials.cover.normalMap = textures.cover1Normal
+    materials.cover.roughnessMap = textures.cover1Roughness
 
-    sheetMaterial.map = textures.paperColor
-    sheetMaterial.normalMap = textures.paperNormal
-    sheetMaterial.roughnessMap = textures.paperRoughness
+    for (let i = 0; i < sheet.count; i++) {
+        materials.sheets.push(
+            new THREE.ShaderMaterial({
+                uniforms: {
+                    frontTexture: { value: textures.paperColor.clone() },
+                    backTexture: { value: textures.paperColor.clone() },
+                    normalMap: { value: textures.paperNormal },
+                    roughnessMap: { value: textures.paperRoughness },
+                },
+                vertexShader: vertexShader,
+                fragmentShader: fragmentShader,
+                side: THREE.DoubleSide,
+            })
+        )
+    }
 }
 
 
 export { 
     sheet, thick, 
     basePlane,  base,
-    coverGeo, coverMaterial,
-    sheetGeo, sheetMaterial,
+    materials,
+    coverGeo, 
+    sheetGeo, 
     setTextures
 }
