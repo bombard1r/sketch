@@ -12,7 +12,7 @@ const texScale = (texture, repX, repY) => {
 const textures = {}
 const textureLoader = new THREE.TextureLoader()
 let loaded = 0
-const texCount = 8
+const texCount = 11
 function checkLoad() {
     loaded++
     if (loaded === texCount) {
@@ -55,6 +55,17 @@ function loadTextures() {
     textures.cover1Normal.repeat.set(1,1)
     textures.cover1Roughness = textures.coverRoughness.clone()
     textures.cover1Roughness.repeat.set(1,1)
+
+    // Wood Textures
+    textures.woodColor = textureLoader.load('/textures/wood/Poliigon_WoodVeneerOak_7760_BaseColor.jpg', checkLoad)
+    textures.woodColor.colorSpace = THREE.SRGBColorSpace
+    texScale(textures.woodColor, 1, 1)
+    // textures.woodDisplacement = textureLoader.load('/textures/wood/Poliigon_WoodVeneerOak_7760_Displacement.tiff', checkLoad)
+    // texScale(textures.woodDisplacement, 0.15, 0.15)
+    textures.woodNormal = textureLoader.load('/textures/wood/Poliigon_WoodVeneerOak_7760_Normal.png', checkLoad)
+    texScale(textures.woodNormal, 1, 1)
+    textures.woodRoughness = textureLoader.load('/textures/wood/Poliigon_WoodVeneerOak_7760_Roughness.jpg', checkLoad)
+    texScale(textures.woodRoughness, 1, 1)
 }
 
 

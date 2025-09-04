@@ -12,7 +12,8 @@ const sizes =
     pixelRatio: Math.min(window.devicePixelRatio, 2)
   }
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
-camera.position.set(0,0,20)
+camera.position.set(0,-5,30)
+camera.lookAt(0,0,0)
 scene.add(camera)
 
 
@@ -25,11 +26,11 @@ renderer.render(scene, camera)
 
 // Lights
 function addLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8) 
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1) 
     scene.add(ambientLight)
 
-    const pointLight = new THREE.PointLight(0xff9000, 1500)
-    pointLight.position.set(0,-10,40)
+    const pointLight = new THREE.PointLight(0xff9000, 5000)
+    pointLight.position.set(0,-14,40)
     scene.add(pointLight)
 }
 

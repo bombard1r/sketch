@@ -17,6 +17,18 @@ const thick = {
 }
 const materials = {}
 
+
+//
+    //Table
+//
+const tableGeo = new THREE.PlaneGeometry(100,100, 64,64)
+materials.table = new THREE.MeshStandardMaterial({
+    color: 0x777777,
+})
+const table = new THREE.Mesh(tableGeo, materials.table)
+table.position.set(0, 0, -1 )
+scene.add(table)
+
 //
     //Base
 //
@@ -70,6 +82,10 @@ function setTextures(){
     materials.cover.map = textures.cover1Color
     materials.cover.normalMap = textures.cover1Normal
     materials.cover.roughnessMap = textures.cover1Roughness
+
+    materials.table.map = textures.woodColor
+    materials.table.normalMap = textures.woodNormal
+    materials.table.roughnessMap = textures.woodRoughness
 
     for (let i = 0; i < sheet.count; i++) {
         materials.sheets.push(
