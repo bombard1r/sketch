@@ -7,15 +7,16 @@ let isDrawing = false // Flag to track if the image is being drawn
 let scale = 0.5 // Scale factor for zooming
 let isMoving = false // Flag to track if the image is being moved
 let position = { x: 100, y: 100 } // Position of the image
+let rotation = 0 // Rotation angle of the image
 
 // Print image on key 'P'
 export function  printImage() 
 {
     // Load paper and image textures
-    const paperImage = textures.paperColor.image 
+    const paperImage = materials.sheets[1].uniforms.frontTexture.value.image
     const pictureImage = new Image()
     pictureImage.crossOrigin = 'anonymous'
-    pictureImage.src = '/wings.jpg'
+    pictureImage.src = '/dogger.png'
 
     // Create a canvas to blend the two images
     const canvas = document.createElement('canvas')
@@ -35,14 +36,21 @@ export function  printImage()
         context.clearRect(0, 0, canvas.width, canvas.height)
 
         // Draw paper texture first
-        console.log(canvas.width, canvas.height)
         context.drawImage(paperImage, 0, 0, canvas.width, canvas.height)
+
+        context.save()
         context.globalAlpha = 0.9
         context.globalCompositeOperation = 'multiply'
         // Draw picture on top
         const imgWidth = canvas.width * scale
         const imgHeight = canvas.height * scale
-        context.drawImage(pictureImage, position.x, position.y, imgWidth, imgHeight)
+        // Rotation
+        const centerX = position.x + imgWidth / 2
+        const centerY = position.y + imgHeight / 2
+        context.translate(centerX, centerY)
+        context.rotate(rotation)
+        context.drawImage(pictureImage, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight)
+        context.restore()
 
         const blendedTexture = new THREE.CanvasTexture(canvas)
         blendedTexture.needsUpdate = true
@@ -64,6 +72,19 @@ export function  printImage()
         if (event.code === 'Enter')
         {
             isDrawing = false
+        }
+
+        if (event.code === 'KeyE' && isDrawing)
+        {
+            rotation += Math.PI / 24 // Rotate by 10 degrees
+            drawImage()
+        }
+
+
+        if (event.code === 'KeyQ' && isDrawing)
+        {
+            rotation -= Math.PI / 24 // Rotate by 10 degrees
+            drawImage()
         }
     })
 
